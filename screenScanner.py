@@ -5,7 +5,7 @@ import threading
 import utils
 
 def scanIt(interval):
-	threading.Timer(interval, scanIt).start()
+	threading.Timer(int(interval), scanIt, [interval]).start()
 
 	utils.takeScreenshot()
 	img = utils.getImage(len(utils.images) - 1)
@@ -42,3 +42,6 @@ def scanIt(interval):
 	# cv2.imwrite("ROI.jpg", roi)
 
 	print('Interval screenshot taking #%d, isBookPage:%r' % (len(utils.images), ratio == 1.41))
+
+    # if (ratio == 1.41):
+    #     return True
