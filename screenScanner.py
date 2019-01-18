@@ -40,6 +40,7 @@ def scanIt(interval):
 	cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
 
 	roi = img [y:y+h, x:x+w]
+	print('Y: %d, X: %d, W: %d, H: %d' % (y,x,w,h))
 
 	ratioFits = ratio > 1.35 and ratio < 1.45
 	print('Interval screenshot taking #%d, isBookPage:%r' % (len(utils.images), ratioFits))
@@ -47,6 +48,8 @@ def scanIt(interval):
 	if ratioFits:
 		utils.images.append(roi)
 		imgPath = './pics/ROI%d.jpg' % len(utils.images)
+		# size of image should be around 430 x 600
+		# resizedRoi = cv2.resize(roi, (430,600))
 		cv2.imwrite(imgPath, roi)		
 		pyautogui.press('right')
 		if (roi == utils.images[len(utils.images) - 1]).all and len(utils.images) != 1:
@@ -55,7 +58,7 @@ def scanIt(interval):
 			# imagelist is the list with all image filenames
 			for index, val in enumerate(utils.images):
 				pdf.add_page()
-				pdf.image('./pics/ROI%d.jpg' % int(index + 1), x, y, w, h)
+				pdf.image('./pics/ROI%d.jpg' % int(index + 1))
 			pdf.output("./pdfs/output.pdf", "F")
 			print('Success saving pdf!')
 			thread.cancel()
