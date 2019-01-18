@@ -1,14 +1,15 @@
 import cv2
 import numpy as np
 import threading
+import pyautogui
+from fpdf import FPDF
 
 import utils
 
 def scanIt(interval):
 	threading.Timer(int(interval), scanIt, [interval]).start()
 
-	utils.takeScreenshot()
-	img = utils.getImage(len(utils.images) - 1)
+	img = utils.takeScreenshot()
 
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
@@ -39,9 +40,21 @@ def scanIt(interval):
 	cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
 
 	roi = img [y:y+h, x:x+w]
-	# cv2.imwrite("ROI.jpg", roi)
 
-	print('Interval screenshot taking #%d, isBookPage:%r' % (len(utils.images), ratio == 1.41))
+	ratioFits = ratio > 1.35 and ratio < 1.45
+	print('Interval screenshot taking #%d, isBookPage:%r' % (len(utils.images), ratioFits))
 
-    # if (ratio == 1.41):
-    #     return True
+	if ratioFits:
+		utils.images.append(roi)
+		imgPath = './pics/ROI%d.jpg' % len(utils.images)
+		cv2.imwrite(imgPath, roi)		
+		pyautogui.press('right')
+		if (roi == utils.images[len(utils.images) - 1]).all:
+			print('Saving images as pdf...')
+			pdf = FPDF()
+			# imagelist is the list with all image filenames
+			for index, val in enumerate(utils.images):
+				pdf.add_page()
+				pdf.image('./pics/ROI%d.jpg' % int(index + 1))
+			pdf.output("./pdfs/output.pdf", "F")
+			print('Success saving pdf!')
