@@ -16,6 +16,8 @@ args = vars(ap.parse_args())
 
 userInput = 0
 
+utils.images = []
+
 def menuPrompt():
 	print('\nMenu\n')
 	print('1. Start scanner (interval: %d)\n' % int(args.get('interval')))

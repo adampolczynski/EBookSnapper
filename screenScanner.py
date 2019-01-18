@@ -7,8 +7,8 @@ from fpdf import FPDF
 import utils
 
 def scanIt(interval):
-	threading.Timer(int(interval), scanIt, [interval]).start()
-
+	thread = threading.Timer(int(interval), scanIt, [interval])
+	thread.start()
 	img = utils.takeScreenshot()
 
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -49,12 +49,13 @@ def scanIt(interval):
 		imgPath = './pics/ROI%d.jpg' % len(utils.images)
 		cv2.imwrite(imgPath, roi)		
 		pyautogui.press('right')
-		if (roi == utils.images[len(utils.images) - 1]).all:
+		if (roi == utils.images[len(utils.images) - 1]).all and len(utils.images) != 1:
 			print('Saving images as pdf...')
 			pdf = FPDF()
 			# imagelist is the list with all image filenames
 			for index, val in enumerate(utils.images):
 				pdf.add_page()
-				pdf.image('./pics/ROI%d.jpg' % int(index + 1))
+				pdf.image('./pics/ROI%d.jpg' % int(index + 1), x, y, w, h)
 			pdf.output("./pdfs/output.pdf", "F")
 			print('Success saving pdf!')
+			thread.cancel()
